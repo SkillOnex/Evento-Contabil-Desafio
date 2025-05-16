@@ -9,20 +9,23 @@ use Tests\TestCase;
 
 class EspacoCafeApiTest extends TestCase
 {
-    // use RefreshDatabase;
+    use RefreshDatabase;
 
+    //Autentica para o teste
     protected function authenticate()
     {
         $user = User::factory()->create();
         $this->actingAs($user, 'sanctum');
     }
 
+    //Testar o Get de cafes sem estar Autenticado
     public function test_list_cafes_requires_authentication()
     {
         $response = $this->getJson('/api/cafes');
         $response->assertStatus(401);
     }
 
+    //Testar o Get de cafes Autenticado
     public function test_list_cafes_returns_data_when_authenticated()
     {
         $this->authenticate();
@@ -35,6 +38,7 @@ class EspacoCafeApiTest extends TestCase
                  ->assertJsonCount(3);
     }
 
+    //Testar o POST de cafes
     public function test_create_cafe()
     {
         $this->authenticate();
@@ -52,6 +56,7 @@ class EspacoCafeApiTest extends TestCase
         $this->assertDatabaseHas('espaco_cafes', $data);
     }
 
+    //Testar o GET de cafes pelo $id
     public function test_show_cafe()
     {
         $this->authenticate();
@@ -63,10 +68,11 @@ class EspacoCafeApiTest extends TestCase
         $response->assertStatus(200)
                  ->assertJsonFragment([
                      'nome' => $cafe->nome,
-                     'lotacao' => $cafe->lotacao,
+                     'lotacao' => (int) $cafe->lotacao,
                  ]);
     }
 
+    //Testar o PUT de cafes pelo $id
     public function test_update_cafe()
     {
         $this->authenticate();
@@ -86,6 +92,7 @@ class EspacoCafeApiTest extends TestCase
         $this->assertDatabaseHas('espaco_cafes', $updateData);
     }
 
+    //Testar o DELETE de cafes pelo $id
     public function test_delete_cafe()
     {
         $this->authenticate();

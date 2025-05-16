@@ -9,20 +9,23 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class PessoaParticipanteApiTest extends TestCase
 {
-    // use RefreshDatabase;
+    use RefreshDatabase;
 
+    //Autentica para o teste
     protected function authenticate()
     {
         $user = User::factory()->create();
         $this->actingAs($user, 'sanctum');
     }
 
+    //Testar o GET de pessoas sem estar Autenticado
     public function test_list_pessoas_requires_authentication()
     {
         $response = $this->getJson('/api/pessoas');
         $response->assertStatus(401); // Não autorizado se não estiver autenticado
     }
 
+    //Testar o GET de pessoas Autenticado
     public function test_list_pessoas_returns_data_when_authenticated()
     {
         $this->authenticate();
@@ -35,6 +38,7 @@ class PessoaParticipanteApiTest extends TestCase
                  ->assertJsonCount(3);
     }
 
+    //Testar o POST de pessoas 
     public function test_create_pessoa_participante()
     {
         $this->authenticate();
@@ -52,6 +56,7 @@ class PessoaParticipanteApiTest extends TestCase
         $this->assertDatabaseHas('pessoa_participantes', $data);
     }
 
+    //Testar o PUT de pessoas pelo $id
     public function test_update_pessoa_participante()
     {
         $this->authenticate();
@@ -71,6 +76,7 @@ class PessoaParticipanteApiTest extends TestCase
         $this->assertDatabaseHas('pessoa_participantes', $updateData + ['id' => $pessoa->id]);
     }
 
+    //Testar o DELETE de pessoas pelo $id
     public function test_delete_pessoa_participante()
     {
         $this->authenticate();

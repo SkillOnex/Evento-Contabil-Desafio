@@ -4,61 +4,52 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\SalaTreinamento;
 
 class SalaTreinamentoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    //Index : Exibir todas as Salas
     public function index()
     {
-        //
+        return SalaTreinamento::all();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+    //Store : Registrar uma nova sala 
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'nome' => 'required|string',
+            'lotacao' => 'required|integer',
+        ]);
+
+        $sala = SalaTreinamento::create($validated);
+        return response()->json($sala, 201);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    //Show : Exibir sala existente pelo $id
     public function show($id)
     {
-        //
+        return SalaTreinamento::findOrFail($id);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    //Update : Ataualizar uma sala já existente pelo $id
     public function update(Request $request, $id)
     {
-        //
+        $sala = SalaTreinamento::findOrFail($id);
+
+        $validated = $request->validate([
+            'nome' => 'sometimes|required|string',
+            'lotacao' => 'sometimes|required|integer',
+        ]);
+
+        $sala->update($validated);
+        return response()->json($sala);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    //Destroy : Deletar uma sala existente pelo $id
     public function destroy($id)
     {
-        //
+        SalaTreinamento::findOrFail($id)->delete();
+        return response()->json(null, 204);
     }
 }

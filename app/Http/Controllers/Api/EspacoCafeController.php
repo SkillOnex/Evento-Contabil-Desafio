@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\EspacoCafe;
 use Illuminate\Http\Request;
 
 class EspacoCafeController extends Controller
@@ -23,6 +24,7 @@ class EspacoCafeController extends Controller
     {
         $validated = $request->validate([
             'nome' => 'required|string',
+            'lotacao' => 'required|string',
 
         ]);
 
@@ -37,7 +39,7 @@ class EspacoCafeController extends Controller
 
         $validated = $request->validate([
             'nome' => 'sometimes|required|string',
-
+            'lotacao' => 'required|string',
         ]);
 
         $cafe->update($validated);

@@ -22,35 +22,18 @@ use App\Http\Controllers\Api\PessoaParticipanteController;
 use App\Http\Controllers\Api\SalaTreinamentoController;
 use App\Http\Controllers\Api\EspacoCafeController;
 use App\Http\Controllers\Api\AlocacaoEtapaEventoController;
+use App\Http\Controllers\Api\AuthController;
+
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('pessoas', PessoaParticipanteController::class);
     Route::apiResource('salas', SalaTreinamentoController::class);
     Route::apiResource('cafes', EspacoCafeController::class);
     Route::apiResource('alocacoes', AlocacaoEtapaEventoController::class);
+
+    Route::post('/logout', [AuthController::class, 'logout']);
+
 });
 
-Route::post('/login', function(Request $request) {
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
-
-    $user = User::where('email', $request->email)->first();
-
-    if (! $user || ! Hash::check($request->password, $user->password)) {
-        throw ValidationException::withMessages([
-            'email' => ['The provided credentials are incorrect.'],
-        ]);
-    }
-
-    // Cria token com nome 'api-token'
-    $token = $user->createToken('api-token')->plainTextToken;
-
-    return response()->json(['token' => $token]);
-});
-
-Route::middleware('auth:sanctum')->post('/logout', function(Request $request) {
-    $request->user()->currentAccessToken()->delete();
-    return response()->json(['message' => 'Logged out']);
-});
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);

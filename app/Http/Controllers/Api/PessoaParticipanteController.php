@@ -8,16 +8,19 @@ use Illuminate\Http\Request;
 
 class PessoaParticipanteController extends Controller
 {
+    //Index : Retornar Todos os participantes
     public function index()
     {
         return PessoaParticipante::all();
     }
 
+    //Show : Retornar Participantes pelo $id
     public function show($id)
     {
         return PessoaParticipante::findOrFail($id);
     }
 
+    //Store : Registrar Novos participantes
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -29,6 +32,7 @@ class PessoaParticipanteController extends Controller
         return response()->json($pessoa, 201);
     }
 
+    //Update : Atualizar um participante ja existente pelo $id
     public function update(Request $request, $id)
     {
         $pessoa = PessoaParticipante::findOrFail($id);
@@ -42,6 +46,7 @@ class PessoaParticipanteController extends Controller
         return response()->json($pessoa);
     }
 
+    //Destroy : Deletar o participante pelo $id
     public function destroy($id)
     {
         PessoaParticipante::findOrFail($id)->delete();

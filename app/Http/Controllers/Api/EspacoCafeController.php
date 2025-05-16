@@ -9,18 +9,20 @@ use Illuminate\Http\Request;
 class EspacoCafeController extends Controller
 {
 
+    //Index : Exibir todos os cafes
     public function index()
     {
         return EspacoCafe::all();
     }
 
-
+    //Show : Exibir cafes pelo $id
     public function show($id)
     {
         return EspacoCafe::findOrFail($id);
     }
 
-     public function store(Request $request)
+    //Store : Registrar um café 
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'nome' => 'required|string',
@@ -32,7 +34,7 @@ class EspacoCafeController extends Controller
         return response()->json($cafe, 201);
     }
 
-
+    //Update: Atualizar um café ja existente pelo $id
     public function update(Request $request, $id)
     {
         $cafe = EspacoCafe::findOrFail($id);
@@ -46,7 +48,7 @@ class EspacoCafeController extends Controller
         return response()->json($cafe);
     }
 
-
+    //Destroy : Deletar um café pelo $id
     public function destroy($id)
     {
         EspacoCafe::findOrFail($id)->delete();

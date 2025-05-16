@@ -25,15 +25,16 @@ use App\Http\Controllers\Api\AlocacaoEtapaEventoController;
 use App\Http\Controllers\Api\AuthController;
 
 
+//Rotas protegidas
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('pessoas', PessoaParticipanteController::class);
     Route::apiResource('salas', SalaTreinamentoController::class);
     Route::apiResource('cafes', EspacoCafeController::class);
     Route::apiResource('alocacoes', AlocacaoEtapaEventoController::class);
-
     Route::post('/logout', [AuthController::class, 'logout']);
 
 });
 
+//Rotas comuns
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);

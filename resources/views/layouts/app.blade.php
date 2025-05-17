@@ -32,7 +32,7 @@
     }
 
     .datatable-top {
-        margin-left: -50px !important;
+        margin-left: -70px !important;
     }
 
     .input-style {
@@ -59,7 +59,7 @@
     @stack('head')
 </head>
 
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+<body class="bg-gray-200 min-h-screen flex items-center justify-center">
 
     @yield('content')
     <script src="https://unpkg.com/flowbite@latest/dist/flowbite.min.js"></script>

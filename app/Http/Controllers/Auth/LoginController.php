@@ -28,7 +28,7 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             // Redirecionar após login
-            return redirect()->intended('/evento'); // ou qualquer rota que queira
+            return redirect()->intended('/evento');
         }
 
         return back()->withErrors([

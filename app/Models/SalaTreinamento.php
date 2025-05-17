@@ -15,4 +15,10 @@ class SalaTreinamento extends Model
     {
         return $this->hasMany(AlocacaoEtapaEvento::class, 'sala_treinamento_id');
     }
+
+    public function pessoas()
+    {
+        return $this->belongsToMany(PessoaParticipante::class, 'alocacoes_salas', 'sala_id', 'pessoa_id')
+                    ->withTimestamps();
+    }
 }

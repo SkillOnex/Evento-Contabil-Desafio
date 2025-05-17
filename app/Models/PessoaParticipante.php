@@ -15,4 +15,9 @@ class PessoaParticipante extends Model
     {
         return $this->hasMany(AlocacaoEtapaEvento::class, 'pessoa_participante_id');
     }
+
+    public function etapa()
+    {
+        return $this->belongsTo(Etapa::class, 'etapa_id');
+    }
 }

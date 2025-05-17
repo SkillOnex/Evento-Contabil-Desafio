@@ -8,6 +8,7 @@ use App\Models\EspacoCafe;
 use App\Models\PessoaParticipante;
 use App\Models\AlocacaoEtapaEvento;
 
+
 class EventoController extends Controller
 {
     // Exibe a view principal do evento, com salas, cafés e pessoas com alocações
@@ -24,8 +25,29 @@ class EventoController extends Controller
     public function getSalas()
     {
         $salas = SalaTreinamento::all();
+
+        foreach ($salas as $sala) {
+            $alocacoes = AlocacaoEtapaEvento::where('sala_treinamento_id', $sala->id)
+                ->with('pessoaParticipante')
+                ->get();
+
+            $pessoasPorEtapas = [
+                1 => [],
+                2 => [],
+            ];
+
+            foreach ($alocacoes as $alocacao) {
+                if (isset($pessoasPorEtapas[$alocacao->etapa])) {
+                    $pessoasPorEtapas[$alocacao->etapa][] = $alocacao->pessoaParticipante;
+                }
+            }
+
+            $sala->pessoas_por_etapas = $pessoasPorEtapas;
+        }
+
         return ['salas' => $salas];
     }
+
 
     // Retorna um array com todos os espaços de café
     public function getCafes()
@@ -106,6 +128,25 @@ class EventoController extends Controller
 
         // Retorna arrays associativos com salas e cafés
         return ['salas' => $salas, 'cafes' => $cafes];
+    }
+
+
+    // Salva as salas
+    public function salvarSala(Request $request)
+    {
+        // Validação
+        $request->validate([
+            'name_sala' => 'required|string|max:255',
+            'lotacao' => 'required|integer|min:1',
+        ]);
+
+        // Cria a Sala
+        SalaTreinamento::create([
+            'nome' => $request->name_sala,
+            'lotacao' => $request->lotacao,
+        ]);
+
+        return redirect()->back()->with('success', 'Sala cadastrada com sucesso!');
     }
 
 }

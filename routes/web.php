@@ -17,3 +17,8 @@ Route::post('/register', [RegisterController::class, 'register'])->name('registe
 
 Route::get('/evento', [EventoController::class, 'index'])->name('evento');
 Route::post('/evento/alocar', [EventoController::class, 'storeAlocacoes'])->name('evento.alocar');
+Route::post('/evento/salas', [EventoController::class, 'salvarSala'])->name('evento.salvarSala');
+
+
+
+

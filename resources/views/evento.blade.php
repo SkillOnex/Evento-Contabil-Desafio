@@ -37,13 +37,19 @@
 
             <button type="button" data-modal-target="crud-modal-pessoas" data-modal-toggle="crud-modal-pessoas"
                 class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-2 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 ">Cadastrar</button>
-            <hr class="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700">
-            <table id="search-table">
+            <hr class="h-px my-2 bg-gray-200 border-0 ">
+            <table id="table-pessoa">
                 <thead>
                     <tr>
                         <th>
                             <span class="flex items-center">
                                 Nome
+                            </span>
+                        </th>
+
+                        <th>
+                            <span class="flex items-center">
+                                Ações
                             </span>
                         </th>
 
@@ -54,12 +60,18 @@
                     @foreach($pessoas as $pessoa)
                     <tr>
                         <td>
-                            <a href="#" class="btn-show-modal" data-nome="{{ $pessoa->nome }}"
+                            <p class="font-bold text-gray-600">
+                                {{ $pessoa->nome }} {{ $pessoa->sobrenome }}
+                            </p>
+                        </td>
+                        <td>
+                            <a href="#" class="btn-show-modal font-bold text-gray-600" data-nome="{{ $pessoa->nome }}"
                                 data-sobrenome="{{ $pessoa->sobrenome }}" data-salas='@json($pessoa->alocacoes_salas)'
                                 data-cafes='@json($pessoa->alocacoes_cafes)'>
-                                {{ $pessoa->nome }} {{ $pessoa->sobrenome }}
+                                Ver Pessoa
                             </a>
                         </td>
+
                     </tr>
                     @endforeach
 
@@ -72,23 +84,37 @@
         </div>
 
         <!-- Salas -->
-        <div class="hidden p-4 rounded-lg bg-gray-50 " id="salas" role="tabpanel" aria-labelledby="salas-tab">
-            <form class="max-w-md mx-auto space-y-4">
-                <div>
-                    <label for="nome_sala" class="block mb-1 font-medium text-gray-700 ">Nome da
-                        Sala</label>
-                    <input type="text" id="nome_sala" name="nome_sala" placeholder="Digite o nome da sala"
-                        class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
-                </div>
-                <div>
-                    <label for="lotacao_sala" class="block mb-1 font-medium text-gray-700 ">Lotação</label>
-                    <input type="number" id="lotacao_sala" name="lotacao_sala" placeholder="Capacidade máxima" min="1"
-                        class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
-                </div>
-                <button type="submit"
-                    class="px-4 py-2 font-semibold text-white bg-green-600 rounded hover:bg-green-700">Cadastrar
-                    Sala</button>
-            </form>
+        <div class="hidden p-4 rounded-lg bg-white " id="salas" role="tabpanel" aria-labelledby="salas-tab">
+            <button type="button" data-modal-target="modal-crud-salas" data-modal-toggle="modal-crud-salas"
+                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-2 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 ">Cadastrar</button>
+            <hr class="h-px my-2 bg-gray-200 border-0 ">
+
+            <table id="table-sala">
+                <thead>
+                    <tr>
+                        <th>Nome da Sala</th>
+                        <th>Lotação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($salas as $sala)
+                    <tr>
+                        <td class="font-bold text-gray-600">{{ $sala->nome }}</td>
+                        <td class="font-bold text-gray-600">{{ $sala->lotacao }}</td>
+                        <td>
+                            <button class="btn-show-modal-salas font-bold text-gray-600" data-id="{{ $sala->id }}" data-nome="{{ $sala->nome }}"
+                                data-alocacoes='@json($sala->pessoas_por_etapas)'>
+
+                                Ver Salas
+                            </button>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+
+
         </div>
 
         <!-- Cafés -->
@@ -146,7 +172,6 @@
     <div id="crud-modal-pessoas" tabindex="-1" aria-hidden="true"
         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative p-4 w-full max-w-md max-h-full">
-            <
             <div class="relative bg-white rounded-lg shadow-sm ">
 
                 <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t ">
@@ -306,38 +331,111 @@
 
 
 
+        </div>
+    </div>
+</div>
+
+<!-- Modal Pessoas -->
+<div id="modalPessoa"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 transition-opacity duration-300"
+    aria-hidden="true">
+    <div
+        class="relative w-full max-w-2xl max-h-[90vh] bg-white rounded-xl shadow-2xl p-6 transform transition-all duration-300 scale-95">
+
+        <button id="btnCloseModal"
+            class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors duration-200"
+            aria-label="Close modal">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                </path>
+            </svg>
+        </button>
+
+
+        <h2 id="modalNomeCompleto" class="text-2xl font-bold text-gray-900 mb-4"></h2>
+        <hr class="my-4 border-gray-200">
+
+
+        <ol id="listaEtapas" class="relative border-l-2 border-blue-500">
+
+        </ol>
+    </div>
+</div>
+
+
+<!-- Modal Salas -->
+<div id="modalSala"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 transition-opacity duration-300"
+    aria-hidden="true">
+    <div
+        class="relative w-full max-w-2xl max-h-[90vh] bg-white rounded-xl shadow-2xl p-6 transform transition-all duration-300 scale-95">
+
+        <button id="btn-close-sala"
+            class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors duration-200"
+            aria-label="Close modal">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                </path>
+            </svg>
+        </button>
+
+
+
+        <!-- Título dinâmico -->
+            <h2 id="modalSalaNome" class="text-xl font-bold mb-4">Sala</h2>
+
+            <!-- Lista das etapas com pessoas -->
+            <ul id="listaEtapasSala" class="relative border-l-2 border-blue-500">
+            <!-- Itens vão ser inseridos aqui pelo JS -->
+            </ul>
+    </div>
+</div>
+
+<!-- Modal CRUD Salas -->
+<div id="modal-crud-salas" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+
+        <div class="relative bg-white rounded-lg shadow-sm ">
+
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t  border-gray-200">
+                <h3 class="text-xl font-semibold text-gray-900">
+                    Cadastrar nova sala
+                </h3>
+                <button type="button" class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center " data-modal-hide="modal-crud-salas">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+
+            <div class="p-4 md:p-5">
+               <form class="space-y-4" method="POST" action="{{ route('evento.salvarSala') }}">
+                    @csrf
+                    <div>
+                        <label for="name_sala" class="block mb-2 text-sm font-medium text-gray-900 ">Nome</label>
+                        <input type="text" name="name_sala" id="name_sala"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Sala 1" required />
+                    </div>
+                    <div>
+                        <label for="lotacao" class="block mb-2 text-sm font-medium text-gray-900 ">Lotação</label>
+                        <input type="number" name="lotacao" id="lotacao" placeholder="23"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            required />
+                    </div>
+
+                    <button type="submit"
+                        class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                        Salvar Sala
+                    </button>
+                </form>
+
             </div>
         </div>
     </div>
-
-    <!-- Modal Pessoas -->
-    <div id="modalPessoa"
-        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 transition-opacity duration-300"
-        aria-hidden="true">
-        <div
-            class="relative w-full max-w-2xl max-h-[90vh] bg-white rounded-xl shadow-2xl p-6 transform transition-all duration-300 scale-95">
-
-            <button id="btnCloseModal"
-                class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors duration-200"
-                aria-label="Close modal">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                    </path>
-                </svg>
-            </button>
-
-
-            <h2 id="modalNomeCompleto" class="text-2xl font-bold text-gray-900 mb-4"></h2>
-            <hr class="my-4 border-gray-200">
-
-
-            <ol id="listaEtapas" class="relative border-l-2 border-blue-500">
-
-            </ol>
-        </div>
-    </div>
-
 </div>
 
 
@@ -345,24 +443,32 @@
 @endsection
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
-$(document).ready(function() {
-    // Inicializa a tabela com DataTable, se o elemento existir e a biblioteca estiver carregada
-    if (
-        $("#search-table").length &&
-        typeof simpleDatatables !== "undefined" &&
-        typeof simpleDatatables.DataTable !== "undefined"
-    ) {
-        const dataTable = new simpleDatatables.DataTable("#search-table", {
-            searchable: true, // Permite busca na tabela
-            sortable: false, // Desabilita ordenação das colunas
-            labels: {
-                placeholder: "Buscar...", // Texto do campo de busca
-                perPage: "Registros por página",
-                noRows: "Nenhum resultado encontrado",
-                info: "Mostrando {start} a {end} de {rows} registros",
-            },
-        });
+
+    // Função para inicializar uma tabela
+    function initDataTable(id) {
+        if ($(id).length && typeof simpleDatatables !== "undefined" && typeof simpleDatatables.DataTable !== "undefined") {
+            return new simpleDatatables.DataTable(id, {
+                searchable: true,
+                sortable: false,
+                labels: {
+                    placeholder: "Buscar...",
+                    perPage: "Registros por página",
+                    noRows: "Nenhum resultado encontrado",
+                    info: "Mostrando {start} a {end} de {rows} registros",
+                },
+            });
+        }
+        return null;
     }
+
+    // Armazena a Tabela
+    const dataTableSala = initDataTable("#table-sala");
+    const dataTablePessoa = initDataTable("#table-pessoa");
+
+$(document).ready(function() {
+    // Inicializa a tabela com DataTable se o elemento existir e a biblioteca estiver carregada
+    initDataTable("#table-sala");
+    initDataTable("#table-pessoa");
 
     // Variáveis para controle das etapas do passo a passo
     let currentStep = 1;
@@ -398,36 +504,36 @@ $(document).ready(function() {
         });
     }
 
-    // Clique no botão "Próximo"
+    // Clique no botão Próximo
     $(".btn-next").click(function() {
         var $currentStepContent = $(".step-content.step-" + currentStep);
         var isValid = true;
 
         // Validação dos campos obrigatórios da etapa atual
         $currentStepContent.find("input[required], select[required], textarea[required]").each(
-        function() {
-            var value = $(this).val();
+            function() {
+                var value = $(this).val();
 
-            if ($(this).is('select')) {
-                // Verifica se select tem valor válido selecionado
-                if (!value || $(this).find('option:selected').is(':disabled')) {
-                    isValid = false;
-                    $(this).addClass("border-red-500"); // Destaca campo inválido
+                if ($(this).is('select')) {
+                    // Verifica se select tem valor válido selecionado
+                    if (!value || $(this).find('option:selected').is(':disabled')) {
+                        isValid = false;
+                        $(this).addClass("border-red-500"); // Destaca campo inválido
+                    } else {
+                        $(this).removeClass("border-red-500");
+                    }
                 } else {
-                    $(this).removeClass("border-red-500");
+                    // Verifica se campo está preenchido
+                    if (!value) {
+                        isValid = false;
+                        $(this).addClass("border-red-500");
+                    } else {
+                        $(this).removeClass("border-red-500");
+                    }
                 }
-            } else {
-                // Verifica se campo está preenchido
-                if (!value) {
-                    isValid = false;
-                    $(this).addClass("border-red-500");
-                } else {
-                    $(this).removeClass("border-red-500");
-                }
-            }
-        });
+            });
 
-        // Se estiver válido, avança para próxima etapa
+        // Se estiver válido avança para próxima etapa
         if (isValid) {
             if (currentStep < totalSteps) {
                 currentStep++;
@@ -436,7 +542,7 @@ $(document).ready(function() {
         }
     });
 
-    // Clique no botão "Anterior"
+    // Clique no botão Anterior
     $(".btn-prev").click(function() {
         if (currentStep > 1) {
             currentStep--;
@@ -507,18 +613,23 @@ $(document).ready(function() {
             var item = `
                 <li class="mb-8 ml-6 transition-all duration-200 hover:bg-gray-100 rounded-lg p-4">
                     <span class="absolute flex items-center justify-center w-8 h-8 bg-blue-600 rounded-full -left-4 ring-4 ring-white">
-                        <svg class="w-5 h-5 text-white" ...>...</svg>
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
                     </span>
+
+
                     <h3 class="text-xl font-semibold text-gray-800 mb-3">Etapa ${etapa}</h3>
                     ${etapas[etapa].salas.map(sala => `
                         <div class="flex items-center mb-2">
-                            <svg class="w-5 h-5 text-blue-600 mr-2" ...>...</svg>
+
                             <p class="text-base font-medium text-gray-600">Sala: ${sala.nome || 'Sem nome'}</p>
                         </div>
                     `).join('')}
                     ${etapas[etapa].cafes.map(cafe => `
                         <div class="flex items-center mb-2">
-                            <svg class="w-5 h-5 text-blue-600 mr-2" ...>...</svg>
+
                             <p class="text-base font-medium text-gray-600">Café: ${cafe.nome || 'Sem nome'}</p>
                         </div>
                     `).join('')}
@@ -545,6 +656,73 @@ $(document).ready(function() {
         if ($(e.target).is('#modalPessoa')) {
             $('#modalPessoa').addClass('hidden');
         }
+    });
+
+
+    $('.btn-show-modal-salas').on('click', function(e) {
+        e.preventDefault();
+
+        // Obtém o nome da sala e as alocações por etapa do atributo data-*
+        const nomeSala = $(this).data('nome');
+        const pessoasEtapas = $(this).data('alocacoes');
+
+        // Define o título do modal com o nome da sala
+        $('#modalSalaNome').text(`Pessoas na sala "${nomeSala}" por etapa`);
+
+        // Limpa a lista de etapas anteriores no modal
+        $('#listaEtapasSala').empty();
+
+        // Verifica se há informações de alocações
+        if (!pessoasEtapas) {
+            // Se não houver, exibe uma mensagem de ausência de dados
+            $('#listaEtapasSala').append('<li>Nenhuma informação disponível.</li>');
+        } else {
+            // Ordena as etapas (chaves do objeto)
+            const etapas = Object.keys(pessoasEtapas).sort();
+
+            // Para cada etapa encontrada
+            etapas.forEach(function(etapa) {
+                const pessoas = pessoasEtapas[etapa]; // Lista de pessoas nessa etapa
+
+                // Cria o HTML do item da etapa
+                let html = `
+                    <li class="mb-8 ml-6 transition-all duration-200 hover:bg-gray-100 rounded-lg p-4">
+                        <span class="absolute flex items-center justify-center w-8 h-8 bg-blue-600 rounded-full -left-4 ring-4 ring-white">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </span>
+
+                        <h3 class="text-xl font-semibold text-gray-800 mb-3">Etapa ${etapa}</h3>`;
+
+                // Se não houver pessoas na etapa
+                if (pessoas.length === 0) {
+                    html += `<p class="text-gray-500">Nenhuma pessoa alocada nesta etapa.</p>`;
+                } else {
+                    // Se houver pessoas lista cada uma
+                    html += "<ul class='list-disc list-inside'>";
+                    pessoas.forEach(function(p) {
+                        html += `<li>${p.nome} ${p.sobrenome || ''}</li>`;
+                    });
+                    html += "</ul>";
+                }
+
+                html += `</li>`; // Fecha o item da etapa
+
+                // Adiciona o HTML gerado ao modal
+                $('#listaEtapasSala').append(html);
+            });
+        }
+
+        // Exibe o modal (remove a classe 'hidden' e faz a animação de scale)
+        $('#modalSala').removeClass('hidden').find('.scale-95').removeClass('scale-95').addClass('scale-100');
+    });
+
+
+    // Fechar modal sala
+    $('#btn-close-sala').off('click').on('click', function () {
+        $('#modalSala').addClass('hidden');
     });
 
     // Exibe a etapa inicial ao carregar

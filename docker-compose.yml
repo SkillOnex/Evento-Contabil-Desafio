@@ -5,8 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: laravel-app
-    container_name: laravel-app
+    image: evento-contabil
+    container_name: evento-contabil
     restart: unless-stopped
     working_dir: /var/www
     volumes:

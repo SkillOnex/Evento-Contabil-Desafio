@@ -31,6 +31,29 @@ Este sistema permite o cadastro e a alocação de pessoas em salas de treinament
    docker exec -it evento-contabil bash
    php artisan migrate
    ```
+2.1 **Obs. Caso seja nescessario mude as configurações do DB no .env**
+
+```bash
+    DB_CONNECTION=mysql
+    DB_HOST=mysql
+    DB_PORT=3306
+    DB_DATABASE=eventocontabil
+    DB_USERNAME=root
+    DB_PASSWORD=root
+```
+```bash
+     mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: eventocontabil
+    ports:
+      - "3307:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+```
 
 3. **Acessar a aplicação no navegador**:
 

@@ -8,12 +8,14 @@ use App\Models\EspacoCafe;
 use App\Models\PessoaParticipante;
 use App\Models\AlocacaoEtapaEvento;
 
+use Illuminate\Support\Facades\Auth;
 
 class EventoController extends Controller
 {
     // Exibe a view principal do evento, com salas, cafés e pessoas com alocações
     public function index()
     {
+
         $getsalas = $this->getSalas();     // Obtém todas as salas
         $getcafes = $this->getCafes();     // Obtém todos os espaços de café
         $pessoas = $this->getPessoas();    // Obtém todas as pessoas com suas alocações
@@ -48,11 +50,34 @@ class EventoController extends Controller
         return ['salas' => $salas];
     }
 
-
     // Retorna um array com todos os espaços de café
     public function getCafes()
     {
         $cafes = EspacoCafe::all();
+
+        foreach ($cafes as $cafe) {
+            // Pega as alocações para este café, com a relação para pessoaParticipante
+            $alocacoes = AlocacaoEtapaEvento::where('espaco_cafe_id', $cafe->id)
+                ->with('pessoaParticipante')
+                ->get();
+
+            // Inicializa array para etapas 1 e 2 (ajuste se tiver mais etapas)
+            $pessoasPorEtapas = [
+                1 => [],
+                2 => [],
+            ];
+
+            // Agrupa pessoas por etapa
+            foreach ($alocacoes as $alocacao) {
+                if (isset($pessoasPorEtapas[$alocacao->etapa])) {
+                    $pessoasPorEtapas[$alocacao->etapa][] = $alocacao->pessoaParticipante;
+                }
+            }
+
+            // Adiciona essa informação no objeto café
+            $cafe->pessoas_por_etapas = $pessoasPorEtapas;
+        }
+
         return ['cafes' => $cafes];
     }
 
@@ -130,14 +155,13 @@ class EventoController extends Controller
         return ['salas' => $salas, 'cafes' => $cafes];
     }
 
-
-    // Salva as salas
-    public function salvarSala(Request $request)
+    // Recebe os dados do formulário e cria uma nova Sala
+    public function storeSala(Request $request)
     {
         // Validação
         $request->validate([
-            'name_sala' => 'required|string|max:255',
-            'lotacao' => 'required|integer|min:1',
+            'name_sala' => 'required|string|max:255|not_regex:/[<>]/',
+            'lotacao' => 'required|integer|min:1|not_regex:/[<>]/',
         ]);
 
         // Cria a Sala
@@ -147,6 +171,24 @@ class EventoController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Sala cadastrada com sucesso!');
+    }
+
+    // Recebe os dados do formulário e cria uma nova Café
+    public function storeCafe(Request $request)
+    {
+        // Validação
+        $request->validate([
+            'name_cafe' => 'required|string|max:255|not_regex:/[<>]/',
+            'lotacao_cafe' => 'required|integer|min:1|not_regex:/[<>]/',
+        ]);
+
+        // Cria a Café
+        EspacoCafe::create([
+            'nome' => $request->name_cafe,
+            'lotacao' => $request->lotacao_cafe,
+        ]);
+
+        return redirect()->back()->with('success', 'Café cadastrado com sucesso!');
     }
 
 }

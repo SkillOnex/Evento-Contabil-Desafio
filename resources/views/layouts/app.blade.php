@@ -11,7 +11,7 @@
 
     <!-- Flowbite -->
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
-
+    <script src="https://unpkg.com/flowbite@latest/dist/flowbite.min.js"></script>
 
 
     <!-- jQuery -->
@@ -32,7 +32,7 @@
     }
 
     .datatable-top {
-        margin-left: -70px !important;
+        margin-left: -39% !important;
     }
 
     .input-style {
@@ -54,6 +54,11 @@
     .step-item.active p {
         @apply text-blue-600 dark: text-blue-500;
     }
+
+    .datatable-wrapper .datatable-bottom .datatable-pagination .datatable-pagination-list-item:last-of-type .datatable-pagination-list-item-link:after{
+        display:none !important;
+    }
+
     </style>
 
     @stack('head')
@@ -62,7 +67,7 @@
 <body class="bg-gray-200 min-h-screen flex items-center justify-center">
 
     @yield('content')
-    <script src="https://unpkg.com/flowbite@latest/dist/flowbite.min.js"></script>
+
     @stack('scripts')
 </body>
 

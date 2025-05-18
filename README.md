@@ -29,7 +29,9 @@ Este sistema permite o cadastro e a alocação de pessoas em salas de treinament
 
    ```bash
    docker exec -it evento-contabil bash
+   php artisan key:generate
    php artisan migrate
+   
    ```
 2.1 **Obs. Caso seja nescessario mude as configurações do DB no .env**
 

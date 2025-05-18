@@ -17,15 +17,15 @@ Este sistema permite o cadastro e a alocação de pessoas em salas de treinament
 - Docker 
 
 ---
+1. **Ajuste o .env.exemple ( basta remover o .exemple e configurar )
 
-
-1. **Criar e subir o Docker**:
+2. **Criar e subir o Docker**:
 
    ```bash
    docker-compose up -d --build
    ```
 
-2. **Acessar o container e rodar as migrations**:
+3. **Acessar o container e rodar as migrations**:
 
    ```bash
    docker exec -it evento-contabil bash
@@ -33,7 +33,7 @@ Este sistema permite o cadastro e a alocação de pessoas em salas de treinament
    php artisan migrate
    
    ```
-2.1 **Obs. Caso seja nescessario mude as configurações do DB no .env**
+3.1 **Obs. Caso seja nescessario mude as configurações do DB no .env**
 
 ```bash
     DB_CONNECTION=mysql
@@ -57,7 +57,7 @@ Este sistema permite o cadastro e a alocação de pessoas em salas de treinament
       - dbdata:/var/lib/mysql
 ```
 
-3. **Acessar a aplicação no navegador**:
+4. **Acessar a aplicação no navegador**:
 
    Acesse: [http://localhost:8000](http://localhost:8000)
 

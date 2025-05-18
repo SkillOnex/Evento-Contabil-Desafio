@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\PessoaParticipante;
@@ -12,39 +13,46 @@ use App\Http\Controllers\EventoController;
 
 class GetPessoasTest extends TestCase
 {
-    use RefreshDatabase; // Reseta o banco de dados entre os testes para ambiente limpo
+    // Garante que o banco de dados seja limpo antes de cada teste
+    use RefreshDatabase;
 
-    public function test_get_pessoas_returns_pessoas_with_alocacoes()
+    // Testa se o método getPessoas retorna corretamente os participantes com suas alocações de sala e café
+    public function test_get_pessoas_returns_pessoas_with_sala_and_cafe_allocations()
     {
-        // Arrange: cria uma sala de treinamento e um espaço de café
-        $sala1 = SalaTreinamento::factory()->create();
-        $cafe1 = EspacoCafe::factory()->create();
+        // Cria uma sala, um café e um participante
+        $sala = SalaTreinamento::factory()->create(['nome' => 'Sala 1']);
+        $cafe = EspacoCafe::factory()->create(['nome' => 'Café 1']);
+        $pessoa = PessoaParticipante::factory()->create(['nome' => 'Carlos']);
 
-        // Cria uma pessoa participante
-        $pessoa = PessoaParticipante::factory()->create();
-
-        // Cria uma alocação para a pessoa na sala e espaço de café na etapa 1
+        // Cria uma alocação do participante na etapa 1, com sala e café associados
         AlocacaoEtapaEvento::create([
             'pessoa_participante_id' => $pessoa->id,
-            'sala_treinamento_id' => $sala1->id,
-            'espaco_cafe_id' => $cafe1->id,
+            'sala_treinamento_id' => $sala->id,
+            'espaco_cafe_id' => $cafe->id,
             'etapa' => 1,
         ]);
 
-        // Act: chama o método getPessoas do controller para buscar as pessoas com alocações
+        // Chama o método do controller que retorna os participantes com alocações
         $controller = new EventoController();
         $result = $controller->getPessoas();
 
-        // Assert: verifica se o resultado tem a chave 'pessoas'
+        // Verifica se o resultado contém a chave 'pessoas'
         $this->assertArrayHasKey('pessoas', $result);
 
-        // Verifica se retornou exatamente uma pessoa
+        // Verifica se foi retornado apenas 1 participante
         $this->assertCount(1, $result['pessoas']);
 
-        // Verifica se a etapa da alocação da sala é '1'
-        $this->assertEquals('1', $result['pessoas'][0]->alocacoes_salas[0]['etapa']);
+        // Pega a pessoa retornada para validações detalhadas
+        $retornada = $result['pessoas'][0];
 
-        // Verifica se o nome da sala alocada é o mesmo da sala criada
-        $this->assertEquals($sala1->nome, $result['pessoas'][0]->alocacoes_salas[0]['nome']);
+        // Verifica se existem dados de alocação de sala
+        $this->assertNotEmpty($retornada->alocacoes_salas);
+        $this->assertEquals(1, $retornada->alocacoes_salas[0]['etapa']);         // Etapa correta
+        $this->assertEquals('Sala 1', $retornada->alocacoes_salas[0]['nome']);   // Nome correto da sala
+
+        // Verifica se existem dados de alocação de café
+        $this->assertNotEmpty($retornada->alocacoes_cafes);
+        $this->assertEquals(1, $retornada->alocacoes_cafes[0]['etapa']);         // Etapa correta
+        $this->assertEquals('Café 1', $retornada->alocacoes_cafes[0]['nome']);   // Nome correto do café
     }
 }

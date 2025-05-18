@@ -7,19 +7,25 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\SalaTreinamento;
 use App\Models\EspacoCafe;
 use App\Models\PessoaParticipante;
+use App\Models\User;
 
 class StoreAlocacoesTest extends TestCase
 {
-    use RefreshDatabase; // Reseta o banco de dados antes de cada teste para garantir ambiente limpo
+    // Garante que o banco de dados seja limpo antes de cada teste
+    use RefreshDatabase;
 
     public function test_store_alocacoes_creates_pessoa_and_alocacoes_and_redirects()
     {
-        // Arrange: cria duas salas de treinamento e um espaço de café para uso no teste
+        // Cria um usuário e autentica para evitar redirecionamento ao login
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        // Cria duas salas de treinamento e um espaço de café para uso no teste
         $sala1 = SalaTreinamento::factory()->create();
         $sala2 = SalaTreinamento::factory()->create();
         $cafe = EspacoCafe::factory()->create();
 
-        // Act: faz uma requisição POST simulando o envio dos dados do formulário para alocar pessoa nas salas e cafés
+        // Faz uma requisição POST simulando o envio dos dados do formulário para alocar pessoa nas salas e cafés
         $response = $this->post('/evento/alocar', [
             'name_etp1' => 'João',
             'lastname_etp1' => 'Marcelo',
@@ -29,7 +35,7 @@ class StoreAlocacoesTest extends TestCase
             'cafe_etp2' => $cafe->id,
         ]);
 
-        // Assert: verifica se o registro da pessoa foi criado no banco de dados
+        // Verifica se o registro da pessoa foi criado no banco de dados
         $this->assertDatabaseHas('pessoa_participantes', [
             'nome' => 'João',
             'sobrenome' => 'Marcelo',

@@ -18,7 +18,7 @@ Route::post('/register', [RegisterController::class, 'register'])->name('registe
 // Rota protegida
 Route::middleware(['auth:web'])->group(function () {
     Route::get('/', function () {
-        return view('evento');
+        return redirect('/evento');
     });
 
     Route::get('/evento', [EventoController::class, 'index'])->name('evento');

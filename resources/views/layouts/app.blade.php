@@ -32,7 +32,7 @@
     }
 
     .datatable-top {
-        margin-left: -39% !important;
+        margin-left: -50% !important;
     }
 
     .input-style {

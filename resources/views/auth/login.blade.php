@@ -21,6 +21,7 @@
                 class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition">
             Entrar
         </button>
+        <p>Não possui uma conta? <a href="{{route('register')}}">Registre-se</a></p>
         @if ($errors->any())
         <p class="text-sm text-red-400 text-center mt-2">
             {{$errors->first()}}

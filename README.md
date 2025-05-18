@@ -2,6 +2,75 @@
 
 ---
 
+# Sistema de Gerenciamento de Evento
+
+Este sistema permite o cadastro e a alocação de pessoas em salas de treinamento e espaços de café durante diferentes etapas de um evento.
+
+## 🚀 Como iniciar o sistema
+
+## 🚀 Requisitos
+
+- PHP 8+
+- Laravel 10+
+- MySQL
+- Postman (ou similar para testar a API)
+- Docker 
+
+---
+
+
+1. **Criar e subir o Docker**:
+
+   ```bash
+   docker-compose up -d --build
+   ```
+
+2. **Acessar o container e rodar as migrations**:
+
+   ```bash
+   docker exec -it evento-contabil bash
+   php artisan migrate
+   ```
+
+3. **Acessar a aplicação no navegador**:
+
+   Acesse: [http://localhost:8000](http://localhost:8000)
+
+## 🔐 Fluxo de Autenticação
+
+- A aplicação redireciona para a página de **login**.
+- Clique em **"Registre-se"** para se cadastrar.
+- Após o cadastro, faça o **login**.
+- Após o login, você será redirecionado para a página `/eventos`.
+
+## 🧭 Funcionalidades
+
+### Aba Pessoa
+
+- Buscar pessoa pelo nome e visualizar suas informações.
+- Cadastrar nova pessoa:
+  - Preencha duas etapas com: **Nome**, **Sobrenome**, **Salas** e **Cafés**.
+
+### Aba Salas
+
+- Visualizar as salas cadastradas e as pessoas alocadas nelas.
+- Cadastrar nova sala com **Nome** e **Lotação**.
+
+### Aba Café
+
+- Visualizar os cafés cadastrados e as pessoas alocadas.
+- Cadastrar novo café com **Nome** e **Lotação**.
+
+## 🧪 Executar os testes
+
+Para rodar apenas os testes unitários:
+
+```bash
+php artisan test --testsuite=Unit
+```
+
+---
+
 # 📡 API de Gerenciamento de Evento
 
 Esta API fornece endpoints para autenticação de usuários, gerenciamento de pessoas participantes, salas de treinamento e espaços de café em um evento de capacitação.
@@ -12,12 +81,12 @@ Esta API fornece endpoints para autenticação de usuários, gerenciamento de pe
 
 ### 📥 Registro
 
-`POST /api/register`
+`POST http://localhost:8000/api/register`
 
 **Campos obrigatórios:**
 ```json
 {
-  "nome": "João Silva",
+  "name": "João Silva",
   "email": "joao@email.com",
   "password": "senha123",
   "password_confirmation": "senha123"
@@ -26,7 +95,7 @@ Esta API fornece endpoints para autenticação de usuários, gerenciamento de pe
 
 ### 🔑 Login
 
-`POST /api/login`
+`POST http://localhost:8000/api/login`
 
 **Campos:**
 ```json
@@ -55,7 +124,7 @@ Authorization: Bearer seu_token_aqui
 
 ### 📄 Listar Espaços
 
-`GET /api/cafes`
+`GET http://localhost:8000/api/cafes`
 
 **Resposta:**
 ```json
@@ -63,38 +132,38 @@ Authorization: Bearer seu_token_aqui
   {
     "id": 1,
     "nome": "Espaço A",
-    "lotacao": 20
+    "lotacao": "20"
   }
 ]
 ```
 
 ### ➕ Criar Espaço
 
-`POST /api/cafes`
+`POST http://localhost:8000/api/cafes`
 
 **Body:**
 ```json
 {
   "nome": "Espaço A",
-  "lotacao": 20
+  "lotacao": "20"
 }
 ```
 
 ### ✏️ Atualizar Espaço
 
-`PUT /api/cafes/{id}`
+`PUT http://localhost:8000/api/cafes/{id}`
 
 **Body:**
 ```json
 {
   "nome": "Espaço B",
-  "lotacao": 25
+  "lotacao": "25"
 }
 ```
 
 ### ❌ Remover Espaço
 
-`DELETE /api/cafes/{id}`
+`DELETE http://localhost:8000/api/cafes/{id}`
 
 ---
 
@@ -102,11 +171,11 @@ Authorization: Bearer seu_token_aqui
 
 ### 📄 Listar Pessoas
 
-`GET /api/pessoas`
+`GET http://localhost:8000/api/pessoas`
 
 ### ➕ Criar Pessoa
 
-`POST /api/pessoas`
+`POST http://localhost:8000/api/pessoas`
 
 **Body:**
 ```json
@@ -118,7 +187,7 @@ Authorization: Bearer seu_token_aqui
 
 ### ✏️ Atualizar Pessoa
 
-`PUT /api/pessoas/{id}`
+`PUT http://localhost:8000/api/pessoas/{id}`
 
 **Body:**
 ```json
@@ -130,7 +199,7 @@ Authorization: Bearer seu_token_aqui
 
 ### ❌ Remover Pessoa
 
-`DELETE /api/pessoas/{id}`
+`DELETE http://localhost:8000/api/pessoas/{id}`
 
 ---
 
@@ -138,41 +207,41 @@ Authorization: Bearer seu_token_aqui
 
 ### 📄 Listar Salas
 
-`GET /api/salas`
+`GET http://localhost:8000/api/salas`
 
 ### ➕ Criar Sala
 
-`POST /api/salas`
+`POST http://localhost:8000/api/salas`
 
 **Body:**
 ```json
 {
   "nome": "Sala 101",
-  "lotacao": 40
+  "lotacao": "40"
 }
 ```
 
 ### ✏️ Atualizar Sala
 
-`PUT /api/salas/{id}`
+`PUT http://localhost:8000/api/salas/{id}`
 
 **Body:**
 ```json
 {
   "nome": "Sala 102",
-  "lotacao": 50
+  "lotacao": "50"
 }
 ```
 
 ### ❌ Remover Sala
 
-`DELETE /api/salas/{id}`
+`DELETE http://localhost:8000/api/salas/{id}`
 
 ---
 
 ## 📌 Observações
 
-- Todas as rotas de `EspacoCafe`, `PessoaParticipante` e `SalaTreinamento` requerem autenticação via Bearer Token.
+- Todas as rotas de `Café`, `Pessoas` e `Salas` requerem autenticação via Bearer Token.
 - As requisições devem ter o header:
   ```http
   Content-Type: application/json
@@ -182,12 +251,4 @@ Authorization: Bearer seu_token_aqui
 
 ---
 
-## 🚀 Requisitos
-
-- PHP 8+
-- Laravel 10+
-- MySQL
-- Postman (ou similar para testar a API)
-
----
 

@@ -17,17 +17,14 @@ class LoginController extends Controller
     // View após o login bem-sucedido
     public function login(Request $request)
     {
-        // Validar dados
+
         $credentials = $request->validate([
-            'name' => 'required|string|max:255|not_regex:/[<>]/',
-            'email' => 'required|email|unique:users,email|not_regex:/[<>]/',
+            'email' => 'required|email|not_regex:/[<>]/',
+            'password' => 'required|string|max:255|not_regex:/[<>]/',
         ]);
 
-       // Tentar autenticar
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-
-            // Redirecionar após login
             return redirect()->intended('/evento');
         }
 

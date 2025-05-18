@@ -105,66 +105,46 @@ class EventoController extends Controller
     {
         $nome = $request->input('name_etp1');
         $sobrenome = $request->input('lastname_etp1');
-
-        // Tenta encontrar a pessoa já existente
-        $pessoa = PessoaParticipante::where('nome', $nome)
-            ->where('sobrenome', $sobrenome)
-            ->first();
-
-        // Se não existir cria
-        if (!$pessoa) {
-            $pessoa = PessoaParticipante::create([
-                'nome' => $nome,
-                'sobrenome' => $sobrenome,
-            ]);
-        }
-
         $sala1 = $request->input('sala_etp1');
         $sala2 = $request->input('sala_etp2');
         $cafe1 = $request->input('cafe_etp1');
         $cafe2 = $request->input('cafe_etp2');
 
-        $salasNovas = [$sala1, $sala2];
-        $cafesNovos = [$cafe1, $cafe2];
+        // Verifica se as salas já atingiram a lotação
+        foreach ([$sala1 => 1, $sala2 => 2] as $salaId => $etapa) {
+            $sala = SalaTreinamento::find($salaId);
+            $ocupados = AlocacaoEtapaEvento::where('sala_treinamento_id', $salaId)
+                ->where('etapa', $etapa)
+                ->count();
 
-        // Conta quantas vezes a pessoa já está em cada sala
-        $salaCounts = DB::table('alocacao_etapa_eventos')
-            ->where('pessoa_participante_id', $pessoa->id)
-            ->select('sala_treinamento_id', DB::raw('count(*) as total'))
-            ->groupBy('sala_treinamento_id')
-            ->pluck('total', 'sala_treinamento_id')
-            ->toArray();
-
-        // Conta quantas vezes a pessoa já está em cada café
-        $cafeCounts = DB::table('alocacao_etapa_eventos')
-            ->where('pessoa_participante_id', $pessoa->id)
-            ->select('espaco_cafe_id', DB::raw('count(*) as total'))
-            ->groupBy('espaco_cafe_id')
-            ->pluck('total', 'espaco_cafe_id')
-            ->toArray();
-
-        // Adiciona as novas alocações dessa requisição
-        foreach ($salasNovas as $salaId) {
-            $salaCounts[$salaId] = ($salaCounts[$salaId] ?? 0) + 1;
-            if ($salaCounts[$salaId] > 2) {
-                return redirect()->back()->withErrors(['erro' => 'Participante não pode ser alocado mais de 2 vezes na mesma sala.']);
+            if ($ocupados >= $sala->lotacao) {
+                return redirect()->back()->withErrors(['erro' => "A sala selecionada para a etapa {$etapa} já está cheia."]);
             }
         }
 
-        foreach ($cafesNovos as $cafeId) {
-            $cafeCounts[$cafeId] = ($cafeCounts[$cafeId] ?? 0) + 1;
-            if ($cafeCounts[$cafeId] > 2) {
-                return redirect()->back()->withErrors(['erro' => 'Participante não pode ser alocado mais de 2 vezes no mesmo café.']);
+        // Verifica se os cafés já atingiram a lotação
+        foreach ([$cafe1 => 1, $cafe2 => 2] as $cafeId => $etapa) {
+            $cafe = EspacoCafe::find($cafeId);
+            $ocupados = AlocacaoEtapaEvento::where('espaco_cafe_id', $cafeId)
+                ->where('etapa', $etapa)
+                ->count();
+
+            if ($ocupados >= $cafe->lotacao) {
+                return redirect()->back()->withErrors(['erro' => "O espaço de café selecionado para a etapa {$etapa} já está cheio."]);
             }
         }
 
-        // Atualiza ou cria a alocação da etapa 1
+        // Se passou pelas validações, agora sim cria a pessoa (se necessário)
+        $pessoa = PessoaParticipante::firstOrCreate(
+            ['nome' => $nome, 'sobrenome' => $sobrenome]
+        );
+
+        // Cria ou atualiza as alocações
         AlocacaoEtapaEvento::updateOrCreate(
             ['pessoa_participante_id' => $pessoa->id, 'etapa' => 1],
             ['sala_treinamento_id' => $sala1, 'espaco_cafe_id' => $cafe1]
         );
 
-        // Atualiza ou cria a alocação da etapa 2
         AlocacaoEtapaEvento::updateOrCreate(
             ['pessoa_participante_id' => $pessoa->id, 'etapa' => 2],
             ['sala_treinamento_id' => $sala2, 'espaco_cafe_id' => $cafe2]
@@ -172,6 +152,7 @@ class EventoController extends Controller
 
         return redirect()->back()->with('success', 'Participante alocado com sucesso!');
     }
+
 
 
     // Retorna as alocações de salas e cafés para uma pessoa participante específica

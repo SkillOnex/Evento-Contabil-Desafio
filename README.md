@@ -17,7 +17,7 @@ Este sistema permite o cadastro e a alocação de pessoas em salas de treinament
 - Docker 
 
 ---
-1. **Ajuste o .env.exemple ( basta remover o .exemple e configurar )
+1. **Ajuste o .env.exemple ( basta remover o .exemple e configurar )**
 
 2. **Criar e subir o Docker**:
 
